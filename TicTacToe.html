@@ -1,0 +1,166 @@
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8">
+    <meta http-equiv="content-style-type" content="text/css">
+    <meta http-equiv="expires" content="0">
+    <link href="Style.css" rel="stylesheet">
+    <script>
+        var feld1 = "leer";
+        var felder = [];
+        var activplayer = "X";
+        var playing = true;
+
+        function laden() {
+            for (var x = 0; x < 3; x++) {
+                felder[x] = new Array();
+
+                for (var y = 0; y < 3; y++) {
+                    felder[x][y] = "";
+                }
+            }
+            updatefield();
+            playing = true
+            if (Math.floor(Math.random() * 2) == 0) {
+                activplayer = "X";
+            } else {
+                activplayer = "O";
+            }
+            document.getElementById("winline").innerHTML = "";
+        }
+
+        function geklickt(feldnr1, feldnr2) {
+            if (felder[feldnr1][feldnr2] == "" && playing) {
+                felder[feldnr1][feldnr2] = activplayer;
+
+                updatefield();
+                //wincheck(feldnr1, feldnr2);
+                wincheck(feldnr1, feldnr2);
+
+                nextturn();
+            }
+        }
+
+        function hoverstart(feldnr1, feldnr2) {
+            var idstring = "feld" + feldnr1 + feldnr2;
+
+            if (felder[feldnr1][feldnr2] == "" && playing) {
+                if (activplayer == "X") {
+                    document.getElementById(idstring).innerHTML = '<div class="cross cross_hover">✕</div>';
+                } else {
+                    document.getElementById(idstring).innerHTML = '<div class="circle circle_hover"></div>';
+                }
+            }
+        }
+
+
+        function nextturn() {
+            if (activplayer == "X") {
+                activplayer = "O";
+            } else {
+                activplayer = "X";
+            }
+        }
+
+        function updatefield() {
+            for (var x = 0; x < 3; x++) {
+                for (var y = 0; y < 3; y++) {
+                    var idstring = "feld" + x + y
+                    if (felder[x][y] == "X") {
+                        document.getElementById(idstring).innerHTML = '<div class="cross">✖</div>';
+                    } else if (felder[x][y] == "O") {
+                        document.getElementById(idstring).innerHTML = '<div class="circle"></div>';
+                    } else {
+                        document.getElementById(idstring).innerHTML = "";
+                    }
+                }
+            }
+        }
+
+
+        function wincheck(activx, activy) { //array machen
+            var playerwon = true;
+            var possiblewinner = activplayer;
+            var winlinepoints = [];
+            var winlineoffset = 25;
+
+            for (var x = 0; x < 3; x++) {
+                if (felder[x][activy] != activplayer) {
+                    playerwon = false;
+                }
+            }
+            if (playerwon) {
+                winlinepoints[0] = winlineoffset + "," + (activy * 100 + 50) + " ";
+                winlinepoints[1] = (300 - winlineoffset) + "," + (activy * 100 + 50);
+            }
+            if (!playerwon) {
+                playerwon = true;
+                for (var y = 0; y < 3; y++) {
+                    if (felder[activx][y] != activplayer) {
+                        playerwon = false;
+                    }
+                }
+                if (playerwon) {
+                    winlinepoints[0] = (activx * 100 + 50) + "," + winlineoffset + " ";
+                    winlinepoints[1] = (activx * 100 + 50) + "," + (300 - winlineoffset);
+                }
+            }
+
+            //if activex==activey...
+            if (!playerwon) {
+                playerwon = true;
+                for (var xy = 0; xy < 3; xy++) {
+                    if (felder[xy][xy] != activplayer) {
+                        playerwon = false;
+                    }
+                }
+                if (playerwon) {
+                    winlinepoints[0] = winlineoffset + "," + winlineoffset + " ";
+                    winlinepoints[1] = (300 - winlineoffset) + "," + (300 - winlineoffset);
+                }
+            }
+            if (!playerwon) {
+                playerwon = true;
+                for (var xy = 0; xy < 3; xy++) {
+                    if (felder[xy][2 - xy] != activplayer) {
+                        playerwon = false;
+                    }
+                }
+                if (playerwon) {
+                    winlinepoints[0] = winlineoffset + "," + (300 - winlineoffset) + " ";
+                    winlinepoints[1] = (300 - winlineoffset) + "," + winlineoffset;
+                }
+            }
+            if (playerwon) {
+                playing = false;
+                setTimeout(function() {
+                    document.getElementById("winline").innerHTML = '<polyline points="' + winlinepoints[0] + winlinepoints[1] + '" style="stroke:red;stroke-width:8px;stroke-linecap:round"></polyline>';
+                }, 30);
+            }
+        }
+    </script>
+</head>
+
+<body onload="laden()">
+    <div id="container" style="position: relative;">
+        <svg id="winline" style="pointer-events: none;position: absolute; height: 300px; width:300px ">
+        </svg>
+        <div class="gamefield" style="">
+            <div class="onefield " id="feld00" onclick="geklickt(0,0); " onmouseover="hoverstart(0,0); " onmouseout="updatefield(); "></div>
+            <div class="onefield " id="feld10" onclick="geklickt(1,0); " onmouseover="hoverstart(1,0); " onmouseout="updatefield(); "></div>
+            <div class="onefield " id="feld20" onclick="geklickt(2,0); " onmouseover="hoverstart(2,0); " onmouseout="updatefield(); "></div>
+            <div class="onefield " id="feld01" onclick="geklickt(0,1); " onmouseover="hoverstart(0,1); " onmouseout="updatefield(); "></div>
+            <div class="onefield " id="feld11" onclick="geklickt(1,1); " onmouseover="hoverstart(1,1); " onmouseout="updatefield(); "></div>
+            <div class="onefield " id="feld21" onclick="geklickt(2,1); " onmouseover="hoverstart(2,1); " onmouseout="updatefield(); "></div>
+            <div class="onefield " id="feld02" onclick="geklickt(0,2); " onmouseover="hoverstart(0,2); " onmouseout="updatefield(); "></div>
+            <div class="onefield " id="feld12" onclick="geklickt(1,2); " onmouseover="hoverstart(1,2); " onmouseout="updatefield(); "></div>
+            <div class="onefield " id="feld22" onclick="geklickt(2,2); " onmouseover="hoverstart(2,2); " onmouseout="updatefield(); "></div>
+        </div>
+
+        <br>
+        <Button onclick="laden(); ">Spiel neustarten</Button>
+    </div>
+</body>
+
+</html>
